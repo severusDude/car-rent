@@ -1,0 +1,48 @@
+import { prisma } from "../src/lib/prisma";
+
+async function main() {
+  const basePrice = 1000; // IDR
+
+  const cars = [
+    { name: "Toyota Avanza", price: 350 * basePrice },
+    { name: "Toyota Innova", price: 500 * basePrice },
+    { name: "Mitsubishi Xpander", price: 400 * basePrice },
+    { name: "Suzuki Ertiga", price: 600 * basePrice },
+    { name: "Honda Mobilio", price: 500 * basePrice },
+    { name: "Toyota Fortuner", price: 900 * basePrice },
+    { name: "Mitsubishi Pajero Sport", price: 950 * basePrice },
+    { name: "Toyota Alphard", price: 2000 * basePrice },
+    { name: "Hiace Commuter", price: 1200 * basePrice },
+    { name: "Daihatsu Sigra", price: 300 * basePrice },
+  ];
+
+  // prevent duplicate data
+  await prisma.car
+    .findFirst({
+      select: { name: true },
+      where: { name: cars[0].name },
+    })
+    .then((car) => {
+      console.log(
+        "Car seed not executed because there is already data in the database"
+      );
+      return;
+    });
+
+  // seed database with cars
+  await prisma.car.createMany({
+    data: cars,
+  });
+
+  console.log("Car seed complete");
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
