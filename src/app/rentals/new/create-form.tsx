@@ -12,17 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const rentalSchema = z.object({
-  carId: z.transform(Number).pipe(z.number().int().positive()),
-  tenantName: z.string().min(2),
-  startDate: z.string(),
-  endDate: z.string(),
-});
+import { rentalSchema, RentalFormValues, createRental } from "./actions";
+import { useFormState } from "react-dom";
+import { ActionResult } from "next/dist/server/app-render/types";
 
 function RentalCreateForm() {
-  const form = useForm<z.infer<typeof rentalSchema>>({
+  const [state, formAction] = useFormState<ActionResult | null, FormData>(
+    createRental,
+    null
+  );
+
+  const form = useForm<RentalFormValues>({
     resolver: zodResolver(rentalSchema),
     defaultValues: {
       carId: 0,
@@ -32,9 +32,19 @@ function RentalCreateForm() {
     },
   });
 
+  async function onSubmit(values: RentalFormValues) {
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    //
+  }
+
   return (
     <Form {...form}>
-      <form className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Car selection */}
         <FormField
           control={form.control}
