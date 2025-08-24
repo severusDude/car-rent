@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -28,8 +29,10 @@ export default function Home() {
             </Button>
 
             {/* CTA */}
-            <Button variant="default" size="icon" className="size-10">
-              <Plus className="size-5" />
+            <Button variant="default" size="icon" asChild className="size-10">
+              <Link href="/rentals/new">
+                <Plus className="size-5" />
+              </Link>
             </Button>
             {/* <ThemeToggle /> */}
           </div>
