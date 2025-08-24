@@ -1,47 +1,67 @@
 "use server";
 
 import { rentalService } from "@/services/rental.service";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-export const rentalSchema = z.object({
-  carId: z.transform(Number).pipe(z.number().int().positive()),
-  tenantName: z.string().min(2),
-  startDate: z.string(),
-  endDate: z.string(),
-});
-
-export type RentalFormValues = z.infer<typeof rentalSchema>;
-
-export type ActionResult = {
+export type ActionResult<T = any> = {
   success: boolean;
-  errors?: Record<string, string[]>;
-  message?: string;
+  data?: T;
+  errors?: string;
 };
 
-export async function createRental(
-  prevState: ActionResult | null,
-  formData: FormData
-): Promise<ActionResult> {
-  const raw = {
-    carId: formData.get("carId"),
-    tenantName: formData.get("tenantName"),
-    startDate: formData.get("startDate"),
-    endDate: formData.get("endDate"),
-  };
+export async function createRental(formData: FormData): Promise<ActionResult> {
+  try {
+    const carId = Number(formData.get("carId"));
+    const tenantName = formData.get("tenantName") as string;
+    const startDate = new Date(formData.get("startDate") as string);
+    const endDate = new Date(formData.get("endDate") as string);
 
-  const parsed = rentalSchema.safeParse(raw);
+    const rental = await rentalService.create({
+      carId,
+      tenantName,
+      startDate,
+      endDate,
+    });
 
-  if (!parsed.success) {
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      data: rental,
+    };
+  } catch (error) {
     return {
       success: false,
-      errors: z.flattenError(parsed.error),
+      errors: error instanceof Error ? error.message : "Unknown error",
     };
   }
-
-  try {
-    await rentalService.create(parsed.data);
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, errors: { _form: [error.message] } };
-  }
 }
+
+// export async function createRental(
+//   prevState: ActionResult | null,
+//   formData: FormData
+// ): Promise<ActionResult> {
+//   const raw = {
+//     carId: formData.get("carId"),
+//     tenantName: formData.get("tenantName"),
+//     startDate: formData.get("startDate"),
+//     endDate: formData.get("endDate"),
+//   };
+
+//   const parsed = rentalSchema.safeParse(raw);
+
+//   if (!parsed.success) {
+//     return {
+//       success: false,
+//       errors: z.flattenError(parsed.error),
+//     };
+//   }
+
+//   try {
+//     await rentalService.create(parsed.data);
+//     return { success: true };
+//   } catch (error: any) {
+//     return { success: false, errors: { _form: [error.message] } };
+//   }
+// }

@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma, Rental } from "@prisma/client";
 
+type CreateInput = {
+  carId: number;
+  tenantName: string;
+  startDate: Date;
+  endDate: Date;
+};
+
 export class RentalService {
   /**
    * Retrieve all rentals.
@@ -27,7 +34,7 @@ export class RentalService {
    * @param data The data for the rental to create.
    * @returns The created rental.
    */
-  async create(data: Prisma.RentalCreateInput): Promise<Rental> {
+  async create(data: CreateInput): Promise<Rental> {
     return await prisma.rental.create({ data });
   }
 }

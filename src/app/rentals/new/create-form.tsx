@@ -11,18 +11,22 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { rentalSchema, RentalFormValues, createRental } from "./actions";
-import { useFormState } from "react-dom";
-import { ActionResult } from "next/dist/server/app-render/types";
+import { createRental } from "./actions";
+import { toast } from "sonner";
+
+export const rentalSchema = z.object({
+  carId: z.transform(Number).pipe(z.number().int().positive()),
+  tenantName: z.string().min(1).max(100),
+  startDate: z.string(),
+  endDate: z.string(),
+});
+
+export type RentalFormData = z.infer<typeof rentalSchema>;
 
 function RentalCreateForm() {
-  const [state, formAction] = useFormState<ActionResult | null, FormData>(
-    createRental,
-    null
-  );
-
-  const form = useForm<RentalFormValues>({
+  const form = useForm<RentalFormData>({
     resolver: zodResolver(rentalSchema),
     defaultValues: {
       carId: 0,
@@ -32,14 +36,25 @@ function RentalCreateForm() {
     },
   });
 
-  async function onSubmit(values: RentalFormValues) {
+  async function onSubmit(data: RentalFormData) {
     const formData = new FormData();
 
-    Object.entries(values).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
+    formData.append("carId", data.carId.toString());
+    formData.append("tenantName", data.tenantName);
+    formData.append("startDate", data.startDate);
+    formData.append("endDate", data.endDate);
 
-    //
+    try {
+      const result = await createRental(formData);
+
+      if (result.success) {
+        toast.success("Rental berhasil dibuat");
+      } else {
+        toast.error(result.errors ?? "Rental gagal dibuat");
+      }
+    } catch (error) {
+      toast.error("Rental gagal dibuat");
+    }
   }
 
   return (
