@@ -4,6 +4,14 @@ import { cn } from "@/lib/utils";
 import { rentalService } from "@/services/rental.service";
 import { ChevronDown, Plus } from "lucide-react";
 import Link from "next/link";
+import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default async function Home() {
   const rentals = await rentalService.index();
@@ -33,11 +41,19 @@ export default async function Home() {
             </Button>
 
             {/* CTA */}
-            <Button variant="default" size="icon" asChild className="size-10">
-              <Link href="/rentals/new">
-                <Plus className="size-5" />
-              </Link>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="default" size="icon" className="size-10">
+                  <Plus className="size-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tambah Rental</DialogTitle>
+                </DialogHeader>
+                <RentalCreateForm />
+              </DialogContent>
+            </Dialog>
             {/* <ThemeToggle /> */}
           </div>
         </div>
