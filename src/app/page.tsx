@@ -1,7 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { rentalService } from "@/services/rental.service";
+import { rentalService } from "@/services/rental-service";
 import { ChevronDown, Plus } from "lucide-react";
 import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
 import {

@@ -1,6 +1,6 @@
 "use server";
 
-import { rentalService } from "@/services/rental.service";
+import { rentalService } from "@/services/rental-service";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
