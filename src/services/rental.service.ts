@@ -14,8 +14,12 @@ export class RentalService {
    *
    * @returns A list of all rentals.
    */
-  async index(): Promise<Rental[]> {
-    return await prisma.rental.findMany();
+  async index(): Promise<
+    Prisma.RentalGetPayload<{ include: { car: true } }>[]
+  > {
+    return await prisma.rental.findMany({
+      include: { car: true },
+    });
   }
 
   /**

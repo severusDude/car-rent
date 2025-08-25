@@ -1,11 +1,15 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { rentalService } from "@/services/rental.service";
 import { ChevronDown, Plus } from "lucide-react";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const rentals = await rentalService.index();
+
   return (
-    <div className="w-full min-h-screen px-[6%] py-12">
+    <div className="flex flex-col gap-6 w-full min-h-screen px-[6%] py-12">
       {/* Header & Reports */}
       <div className="flex justify-between w-full p-6 rounded-lg bg-secondary">
         {/* Header */}
@@ -36,6 +40,71 @@ export default function Home() {
             </Button>
             {/* <ThemeToggle /> */}
           </div>
+        </div>
+      </div>
+
+      {/* Main body */}
+      <div className="flex flex-col flex-1 w-full h-full gap-4">
+        {/* Title */}
+        <h1 className="text-2xl font-semibold text-primary">Rekap rental</h1>
+
+        {/* Content */}
+        <div className="flex flex-1 w-full gap-4">
+          {/* Table */}
+          <div className="flex-1 w-full overflow-hidden outline-1 outline-muted rounded-xl">
+            <table className="w-full table-auto">
+              <thead className="border-b border-muted bg-secondary">
+                <tr>
+                  {[
+                    "No",
+                    "ID Rental",
+                    "Penyewa",
+                    "Mobil",
+                    "Tanggal Mulai",
+                    "Tanggal Selesai",
+                    "Total Harga",
+                  ].map((header) => (
+                    <th
+                      key={header}
+                      className="self-center p-4 text-center text-muted-foreground"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="">
+                {rentals.length > 0 ? (
+                  rentals.map((rental, index) => (
+                    <tr
+                      key={rental.id}
+                      className={cn(index % 2 !== 0 && "bg-muted")}
+                    >
+                      <td className="p-4 text-center">{index + 1}</td>
+                      <td className="p-4 text-center">{rental.id}</td>
+                      <td className="p-4 text-center">{rental.tenantName}</td>
+                      <td className="p-4 text-center">{rental.car.name}</td>
+                      <td className="p-4 text-center">
+                        {rental.startDate.toDateString()}
+                      </td>
+                      <td className="p-4 text-center">
+                        {rental.endDate.toDateString()}
+                      </td>
+                      <td className="p-4 text-center">{100 * 1000}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="p-4 text-center">
+                      Tidak ada data
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          {/* Side Details */}
+          <div className="flex flex-col flex-shrink-0 gap-4 w-80 rounded-xl outline-1 outline-muted"></div>
         </div>
       </div>
     </div>
