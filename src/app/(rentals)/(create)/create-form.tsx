@@ -120,7 +120,12 @@ function RentalCreateForm() {
           )}
         />
 
-        <Button type="submit">Simpan</Button>
+        <div className="flex justify-end w-full gap-2">
+          <Button type="reset" variant="outline">
+            Batal
+          </Button>
+          <Button type="submit">Simpan</Button>
+        </div>
       </form>
     </Form>
   );

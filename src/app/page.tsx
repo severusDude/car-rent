@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { rentalService } from "@/services/rental.service";
 import { ChevronDown, Plus } from "lucide-react";
-import Link from "next/link";
 import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
 import {
   Dialog,
