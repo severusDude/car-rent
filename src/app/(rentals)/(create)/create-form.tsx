@@ -1,27 +1,39 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+
 import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { createRental, getCars } from "./actions";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { Check, Loader2, Minus, Plus, Search } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 import { Car } from "@prisma/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { DialogClose } from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, Plus, Search } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Command,
   CommandEmpty,
@@ -30,23 +42,26 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { DialogClose } from "@/components/ui/dialog";
-import { useState } from "react";
+
+import { createRental } from "./actions";
+import { Slider } from "@/components/ui/slider";
 
 // Schema rental
 export const rentalSchema = z.object({
-  carId: z.transform(Number).pipe(z.number().int().positive()),
-  tenantName: z.string().min(1).max(100),
-  startDate: z.string(),
-  endDate: z.string(),
+  carId: z.number().int().positive("Pilih mobil"),
+  customer: z.string().min(1, "Nama tidak boleh kosong").max(100),
+  startDate: z.string().min(1, "Tanggal tidak boleh kosong"),
+  duration: z
+    .number()
+    .int()
+    .positive()
+    .min(1, "Minimal penyewaan 1 hari")
+    .max(30, "Maximal penyewaan 30 hari"),
+  extraHours: z
+    .number()
+    .int()
+    .min(0, "Jam ekstra tidak boleh negatif")
+    .max(23, "Jam ekstra melebihi 24 jam/1 hari"),
 });
 
 export type RentalFormData = z.infer<typeof rentalSchema>;
@@ -58,9 +73,10 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
     resolver: zodResolver(rentalSchema),
     defaultValues: {
       carId: 0,
-      tenantName: "",
+      customer: "",
       startDate: "",
-      endDate: "",
+      duration: 1,
+      extraHours: 0,
     },
   });
 
@@ -68,9 +84,10 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
     const formData = new FormData();
 
     formData.append("carId", data.carId.toString());
-    formData.append("tenantName", data.tenantName);
+    formData.append("customer", data.customer);
     formData.append("startDate", data.startDate);
-    formData.append("endDate", data.endDate);
+    formData.append("duration", data.duration.toString());
+    formData.append("extraHours", data.extraHours.toString());
 
     try {
       const result = await createRental(formData);
@@ -78,6 +95,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
       if (result.success) {
         toast.success("Rental berhasil dibuat");
         setIsOpen(false);
+        form.reset();
       } else {
         toast.error(result.errors ?? "Rental gagal dibuat");
       }
@@ -159,15 +177,19 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
               )}
             />
 
-            {/* Tenant name */}
+            {/* Customer name */}
             <FormField
               control={form.control}
-              name="tenantName"
+              name="customer"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nama Penyewa</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input
+                      placeholder="Nama penyewa..."
+                      type="text"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,41 +204,112 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
                 <FormItem>
                   <FormLabel>Tanggal Mulai</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="date" {...field} className="cursor-pointer" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Rental end */}
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tanggal Berakhir</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center w-full gap-4">
+              {/* Rental duration */}
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Durasi - {value} hari</FormLabel>
+                    <FormControl>
+                      <Slider
+                        defaultValue={[value]}
+                        min={1}
+                        max={30}
+                        onValueChange={(vals) => {
+                          onChange(vals[0]);
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Durasi penyewaan mobil dalam hari
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* Extra hours */}
+              <FormField
+                control={form.control}
+                name="extraHours"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Ekstra (Jam)</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center justify-center gap-2 rounded-lg outline-1 outline-accent">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          disabled={value <= 0}
+                          className="flex-1 disabled:cursor-not-allowed"
+                          onClick={() => onChange(value > 0 ? value - 1 : 0)}
+                        >
+                          <Minus className="size-3" />
+                        </Button>
+                        <span className="w-5 py-1 text-center select-none">
+                          {value}
+                        </span>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          disabled={value >= 23}
+                          className="flex-1 disabled:cursor-not-allowed"
+                          onClick={() =>
+                            onChange(value <= 23 ? value + 1 : value)
+                          }
+                        >
+                          <Plus className="size-3" />
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <div className="h-5">
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Rangkuman harga */}
+            <div></div>
+
+            {/* Actions */}
             <div className="flex justify-end w-full gap-2">
-              <DialogClose asChild>
-                <Button type="reset" variant="outline">
-                  Batal
-                </Button>
-              </DialogClose>
+              <Button
+                type="reset"
+                variant="outline"
+                onClick={() => {
+                  setIsOpen(false);
+                  form.reset();
+                }}
+              >
+                Batal
+              </Button>
               <Button
                 type="submit"
                 disabled={
                   !form.formState.isValid || form.formState.isSubmitting
                 }
               >
-                Simpan
+                {form.formState.isSubmitting ? (
+                  <>
+                    Menyimpan...
+                    <Loader2 className="ml-2 animate-spin" />
+                  </>
+                ) : (
+                  "Simpan"
+                )}
               </Button>
             </div>
           </form>
