@@ -1,6 +1,23 @@
 "use client";
 
+import { useState } from "react";
+
+import { z } from "zod";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { Check, Plus, Search } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Car } from "@prisma/client";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DialogClose } from "@/components/ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Form,
   FormControl,
@@ -9,19 +26,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { createRental, getCars } from "./actions";
-import { toast } from "sonner";
-import { Car } from "@prisma/client";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, Plus, Search } from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Command,
   CommandEmpty,
@@ -30,16 +41,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { DialogClose } from "@/components/ui/dialog";
-import { useState } from "react";
+
+import { createRental } from "./actions";
 
 // Schema rental
 export const rentalSchema = z.object({
