@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { carService } from "@/services/car-service";
 import { rentalService } from "@/services/rental-service";
@@ -54,17 +54,19 @@ export default async function Home() {
               <thead className="border-b border-muted bg-secondary">
                 <tr>
                   {[
-                    "No",
-                    "ID Rental",
+                    "ID",
                     "Penyewa",
                     "Mobil",
                     "Tanggal Mulai",
-                    "Tanggal Selesai",
+                    "Durasi",
+                    "Biaya",
+                    "Jam Ekstra",
+                    "Diskon",
                     "Total Harga",
                   ].map((header) => (
                     <th
                       key={header}
-                      className="self-center p-4 text-center text-muted-foreground"
+                      className="self-center p-4 font-normal text-center text-muted-foreground"
                     >
                       {header}
                     </th>
@@ -78,15 +80,27 @@ export default async function Home() {
                       key={rental.id}
                       className={cn(index % 2 !== 0 && "bg-muted")}
                     >
-                      <td className="p-4 text-center">{index + 1}</td>
                       <td className="p-4 text-center">{rental.id}</td>
                       <td className="p-4 text-center">{rental.customer}</td>
                       <td className="p-4 text-center">{rental.car.name}</td>
                       <td className="p-4 text-center">
                         {rental.startDate.toDateString()}
                       </td>
-                      <td className="p-4 text-center">{rental.duration}</td>
-                      <td className="p-4 text-center">{100 * 1000}</td>
+                      <td className="p-4 text-center">
+                        {rental.duration} hari
+                      </td>
+                      <td className="p-4 text-center">
+                        {formatCurrency(rental.payment?.baseAmount ?? 0)}
+                      </td>
+                      <td className="p-4 text-center">
+                        {formatCurrency(rental.payment?.extraAmount ?? 0)}
+                      </td>
+                      <td className="p-4 text-center">
+                        {formatCurrency(rental.payment?.discountAmount ?? 0)}
+                      </td>
+                      <td className="p-4 text-center">
+                        {formatCurrency(rental.payment?.totalAmount ?? 0)}
+                      </td>
                     </tr>
                   ))
                 ) : (
