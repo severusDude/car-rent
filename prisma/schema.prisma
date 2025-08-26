@@ -13,23 +13,75 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum PromotionType {
+    PERCENTAGE
+    FIXED
+}
+
+enum PaymentStatus {
+    PENDING
+    PAID
+}
+
+// Mobil
 model Car {
     id     Int      @id @default(autoincrement())
     name   String
-    price  Int
+    price  Int //Harga sewa per hari (IDR)
     Rental Rental[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
+// Rental
 model Rental {
     id         Int      @id @default(autoincrement())
     carId      Int
     car        Car      @relation(fields: [carId], references: [id])
-    tenantName String
-    startDate  DateTime
-    endDate    DateTime
+    customer   String
+    startDate  DateTime //Tanggal mulai rental
+    duration   Int //Durasi rental dalam hari
+    extraHours Int      @default(0) //Jumlah jam tambahan
+    Payment    Payment?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Pembayaran
+model Payment {
+    id             Int           @id @default(autoincrement())
+    rentalId       Int           @unique
+    rental         Rental        @relation(fields: [rentalId], references: [id])
+    baseAmount     Int
+    discountAmount Int           @default(0) //Diskon
+    extraAmount    Int           @default(0) //Biaya/layanan tambahan
+    totalAmount    Int
+    status         PaymentStatus @default(PENDING)
+
+    //Promosi
+    promotionId Int?
+    promotion   Promotion? @relation(fields: [promotionId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Promosi untuk rental n-hari
+model Promotion {
+    id          Int           @id @default(autoincrement())
+    name        String
+    type        PromotionType @default(PERCENTAGE)
+    value       Int
+    minAmount   Int?
+    maxDiscount Int?
+
+    // Kriteria promosi rental
+    minDuration Int? //Minimum durasi rental
+    maxDuration Int? //Maximum durasi rental
+
+    Payment Payment[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
