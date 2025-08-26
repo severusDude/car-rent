@@ -11,9 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { carService } from "@/services/car-service";
 
 export default async function Home() {
   const rentals = await rentalService.index();
+  const cars = await carService.index();
 
   return (
     <div className="flex flex-col gap-6 w-full min-h-screen px-[6%] py-12">
@@ -40,19 +42,7 @@ export default async function Home() {
             </Button>
 
             {/* CTA */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="default" size="icon" className="size-10">
-                  <Plus className="size-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tambah Rental</DialogTitle>
-                </DialogHeader>
-                <RentalCreateForm />
-              </DialogContent>
-            </Dialog>
+            <RentalCreateForm cars={cars} />
             {/* <ThemeToggle /> */}
           </div>
         </div>
