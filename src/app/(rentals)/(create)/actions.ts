@@ -1,5 +1,6 @@
 "use server";
 
+import { carService } from "@/services/car-service";
 import { rentalService } from "@/services/rental-service";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -29,6 +30,21 @@ export async function createRental(formData: FormData): Promise<ActionResult> {
     return {
       success: true,
       data: rental,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errors: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function getCars(): Promise<ActionResult> {
+  try {
+    const cars = await carService.index();
+    return {
+      success: true,
+      data: cars,
     };
   } catch (error) {
     return {
