@@ -1,17 +1,10 @@
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import { rentalService } from "@/services/rental-service";
-import { ChevronDown, Plus } from "lucide-react";
-import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { carService } from "@/services/car-service";
+import { rentalService } from "@/services/rental-service";
+import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
 
 export default async function Home() {
   const rentals = await rentalService.index();
@@ -87,14 +80,12 @@ export default async function Home() {
                     >
                       <td className="p-4 text-center">{index + 1}</td>
                       <td className="p-4 text-center">{rental.id}</td>
-                      <td className="p-4 text-center">{rental.tenantName}</td>
+                      <td className="p-4 text-center">{rental.customer}</td>
                       <td className="p-4 text-center">{rental.car.name}</td>
                       <td className="p-4 text-center">
                         {rental.startDate.toDateString()}
                       </td>
-                      <td className="p-4 text-center">
-                        {rental.endDate.toDateString()}
-                      </td>
+                      <td className="p-4 text-center">{rental.duration}</td>
                       <td className="p-4 text-center">{100 * 1000}</td>
                     </tr>
                   ))

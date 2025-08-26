@@ -46,10 +46,24 @@ import { createRental } from "./actions";
 
 // Schema rental
 export const rentalSchema = z.object({
-  carId: z.transform(Number).pipe(z.number().int().positive()),
-  tenantName: z.string().min(1).max(100),
-  startDate: z.string(),
-  endDate: z.string(),
+  carId: z.number().int().positive("Pilih mobil"),
+  customer: z.string().min(1, "Nama tidak boleh kosong").max(100),
+  startDate: z.string().min(1, "Tanggal tidak boleh kosong"),
+  duration: z
+    .number()
+    .int()
+    .min(1, "Minimal penyewaan 1 hari")
+    .max(30, "Maximal penyewaan 30 hari"),
+  extraHours: z
+    .transform(Number)
+    .pipe(
+      z
+        .number()
+        .int()
+        .positive()
+        .min(0, "Jam ekstra tidak boleh negatif")
+        .max(23, "Jam ekstra melebihi 24 jam/1 hari")
+    ),
 });
 
 export type RentalFormData = z.infer<typeof rentalSchema>;
@@ -61,9 +75,10 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
     resolver: zodResolver(rentalSchema),
     defaultValues: {
       carId: 0,
-      tenantName: "",
+      customer: "",
       startDate: "",
-      endDate: "",
+      duration: 1,
+      extraHours: 0,
     },
   });
 
@@ -71,9 +86,10 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
     const formData = new FormData();
 
     formData.append("carId", data.carId.toString());
-    formData.append("tenantName", data.tenantName);
+    formData.append("customer", data.customer);
     formData.append("startDate", data.startDate);
-    formData.append("endDate", data.endDate);
+    formData.append("duration", data.duration.toString());
+    formData.append("extraHours", data.extraHours.toString());
 
     try {
       const result = await createRental(formData);
@@ -81,6 +97,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
       if (result.success) {
         toast.success("Rental berhasil dibuat");
         setIsOpen(false);
+        form.reset();
       } else {
         toast.error(result.errors ?? "Rental gagal dibuat");
       }
@@ -165,12 +182,16 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
             {/* Tenant name */}
             <FormField
               control={form.control}
-              name="tenantName"
+              name="customer"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nama Penyewa</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input
+                      placeholder="Nama penyewa..."
+                      type="text"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,22 +206,37 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
                 <FormItem>
                   <FormLabel>Tanggal Mulai</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="date" {...field} className="cursor-pointer" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Rental end */}
+            {/* Rental duration */}
             <FormField
               control={form.control}
-              name="endDate"
+              name="duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tanggal Berakhir</FormLabel>
+                  <FormLabel>Durasi penyewaan</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Extra hours */}
+            <FormField
+              control={form.control}
+              name="extraHours"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Jam Tambahan</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -219,7 +255,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
                   !form.formState.isValid || form.formState.isSubmitting
                 }
               >
-                Simpan
+                {form.formState.isSubmitting ? "Menyimpan..." : "Simpan"}
               </Button>
             </div>
           </form>
