@@ -43,7 +43,7 @@ model Rental {
     startDate  DateTime //Tanggal mulai rental
     duration   Int //Durasi rental dalam hari
     extraHours Int      @default(0) //Jumlah jam tambahan
-    Payment    Payment?
+    payment    Payment?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -81,7 +81,7 @@ model Promotion {
     minDuration Int? //Minimum durasi rental
     maxDuration Int? //Maximum durasi rental
 
-    Payment Payment[]
+    payments Payment[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
