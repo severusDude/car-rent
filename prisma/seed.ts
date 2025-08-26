@@ -1,6 +1,7 @@
+import { PromotionType } from "@prisma/client";
 import { prisma } from "../src/lib/prisma";
 
-async function main() {
+async function seedCars() {
   const basePrice = 1000; // IDR
 
   const cars = [
@@ -17,17 +18,17 @@ async function main() {
   ];
 
   // prevent duplicate data
-  await prisma.car
-    .findFirst({
-      select: { name: true },
-      where: { name: cars[0].name },
-    })
-    .then((car) => {
-      console.log(
-        "Car seed not executed because there is already data in the database"
-      );
-      return;
-    });
+  const existingCar = await prisma.car.findFirst({
+    select: { name: true },
+    where: { name: cars[0].name },
+  });
+
+  if (existingCar) {
+    console.log(
+      "Car seed not executed because there is already data in the database"
+    );
+    return;
+  }
 
   // seed database with cars
   await prisma.car.createMany({
@@ -35,6 +36,63 @@ async function main() {
   });
 
   console.log("Car seed complete");
+}
+
+async function seedPromotions() {
+  const promotions = [
+    {
+      name: "Program diskon rental 4 hari",
+      type: PromotionType.PERCENTAGE,
+      value: 10,
+      minDuration: 4,
+      maxDuration: 4,
+      minAmount: null,
+      maxDiscount: null,
+    },
+    {
+      name: "Program diskon rental 1 minggu",
+      type: PromotionType.PERCENTAGE,
+      value: 20,
+      minDuration: 7,
+      maxDuration: 7,
+      minAmount: null,
+      maxDiscount: null,
+    },
+    {
+      name: "Program diskon rental 10 hari",
+      type: PromotionType.PERCENTAGE,
+      value: 25,
+      minDuration: 10,
+      maxDuration: 10,
+      minAmount: null,
+      maxDiscount: null,
+    },
+  ];
+
+  // prevent duplicate data
+  const existingPromotion = await prisma.promotion.findFirst({
+    select: { name: true },
+    where: { name: promotions[0].name },
+  });
+
+  if (existingPromotion) {
+    console.log(
+      "Promotion seed not executed because there is already data in the database"
+    );
+    return;
+  }
+
+  // seed database with promotions
+  await prisma.promotion.createMany({
+    data: promotions,
+  });
+
+  console.log("Promotion seed complete");
+}
+
+async function main() {
+  await seedCars();
+  await seedPromotions();
 }
 
 main()
