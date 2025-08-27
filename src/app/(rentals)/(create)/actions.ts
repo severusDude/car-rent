@@ -5,12 +5,21 @@ import { promotionService } from "@/services/promotion-service";
 import { rentalService } from "@/services/rental-service";
 import { revalidatePath } from "next/cache";
 
+// Define the server action return type
 export type ActionResult<T = any> = {
   success: boolean;
   data?: T;
   errors?: string;
 };
 
+/**
+ * Create a new rental and associated payment.
+ *
+ * @param formData The form data to create the rental.
+ * @returns An object with success, data, and errors properties.
+ * The data property contains the created rental and payment objects.
+ * The errors property contains a string describing the error if any.
+ */
 export async function createRental(formData: FormData): Promise<ActionResult> {
   try {
     // extract form data
@@ -72,15 +81,6 @@ export async function createRental(formData: FormData): Promise<ActionResult> {
     //calculate total amount
     const totalAmount = baseAmount - discountAmount + extraAmount;
 
-    // // insert to db
-    // const rental = await rentalService.create({
-    //   car: { connect: { id: car.id } },
-    //   customer,
-    //   startDate,
-    //   duration,
-    //   extraHours,
-    // });
-
     // initiate transaction with create rental and payment
     const result = await rentalService.createWithPayment({
       rental: {
@@ -118,6 +118,11 @@ export async function createRental(formData: FormData): Promise<ActionResult> {
   }
 }
 
+/**
+ * Retrieve all available cars.
+ *
+ * @returns A list of all cars, or an error response if the operation fails.
+ */
 export async function getCars(): Promise<ActionResult> {
   try {
     const cars = await carService.index();
@@ -132,31 +137,3 @@ export async function getCars(): Promise<ActionResult> {
     };
   }
 }
-
-// export async function createRental(
-//   prevState: ActionResult | null,
-//   formData: FormData
-// ): Promise<ActionResult> {
-//   const raw = {
-//     carId: formData.get("carId"),
-//     tenantName: formData.get("tenantName"),
-//     startDate: formData.get("startDate"),
-//     endDate: formData.get("endDate"),
-//   };
-
-//   const parsed = rentalSchema.safeParse(raw);
-
-//   if (!parsed.success) {
-//     return {
-//       success: false,
-//       errors: z.flattenError(parsed.error),
-//     };
-//   }
-
-//   try {
-//     await rentalService.create(parsed.data);
-//     return { success: true };
-//   } catch (error: any) {
-//     return { success: false, errors: { _form: [error.message] } };
-//   }
-// }

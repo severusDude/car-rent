@@ -114,7 +114,7 @@ export default async function Home() {
             </table>
           </div>
           {/* Side Details */}
-          <div className="flex flex-col flex-shrink-0 gap-4 w-80 rounded-xl outline-1 outline-muted"></div>
+          {/* <div className="flex flex-col flex-shrink-0 gap-4 w-80 rounded-xl outline-1 outline-muted"></div> */}
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { Car } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Popover,
@@ -83,6 +82,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
   async function onSubmit(data: RentalFormData) {
     const formData = new FormData();
 
+    // Append form data
     formData.append("carId", data.carId.toString());
     formData.append("customer", data.customer);
     formData.append("startDate", data.startDate);
@@ -92,6 +92,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
     try {
       const result = await createRental(formData);
 
+      // Handle result
       if (result.success) {
         toast.success("Rental berhasil dibuat");
         setIsOpen(false);
