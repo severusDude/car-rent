@@ -5,14 +5,16 @@ async function seedCars() {
   const basePrice = 1000; // IDR
 
   const cars = [
-    { name: "Toyota Avanza", price: 350 * basePrice },
-    { name: "Toyota Innova", price: 500 * basePrice },
+    { name: "Toyota Avanza", price: 640 * basePrice },
+    { name: "Toyota Innova", price: 890 * basePrice },
+    { name: "New Atlis", price: 1500 * basePrice },
+    { name: "New Camry", price: 2190 * basePrice },
+    { name: "Toyota Alphard", price: 3220 * basePrice },
     { name: "Mitsubishi Xpander", price: 400 * basePrice },
     { name: "Suzuki Ertiga", price: 600 * basePrice },
     { name: "Honda Mobilio", price: 500 * basePrice },
     { name: "Toyota Fortuner", price: 900 * basePrice },
     { name: "Mitsubishi Pajero Sport", price: 950 * basePrice },
-    { name: "Toyota Alphard", price: 2000 * basePrice },
     { name: "Hiace Commuter", price: 1200 * basePrice },
     { name: "Daihatsu Sigra", price: 300 * basePrice },
   ];
