@@ -119,64 +119,86 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Car selection */}
-            <FormField
-              control={form.control}
-              name="carId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mobil</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "w-full justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? cars.find((car) => car.id === field.value)?.name
-                            : "Pilih mobil"}
-                          <Search className="opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command className="w-full">
-                        <CommandInput placeholder="Cari mobil..." />
-                        <CommandList>
-                          <CommandEmpty>Tidak ditemukan</CommandEmpty>
-                          <CommandGroup>
-                            {cars.map((car) => (
-                              <CommandItem
-                                key={car.id}
-                                onSelect={() => {
-                                  form.setValue("carId", car.id);
-                                }}
-                              >
-                                {car.name}
-                                <Check
-                                  className={cn(
-                                    "ml-auto",
-                                    car.id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Car selection & Date Field */}
+            <div className="flex items-center gap-4">
+              {/* Car selection */}
+              <FormField
+                control={form.control}
+                name="carId"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Mobil</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? cars.find((car) => car.id === field.value)?.name
+                              : "Pilih mobil"}
+                            <Search className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command className="w-full">
+                          <CommandInput placeholder="Cari mobil..." />
+                          <CommandList>
+                            <CommandEmpty>Tidak ditemukan</CommandEmpty>
+                            <CommandGroup>
+                              {cars.map((car) => (
+                                <CommandItem
+                                  key={car.id}
+                                  onSelect={() => {
+                                    form.setValue("carId", car.id);
+                                  }}
+                                >
+                                  {car.name}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      car.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Rental start */}
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        className="cursor-pointer"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Customer name */}
             <FormField
@@ -191,21 +213,6 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
                       type="text"
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Rental start */}
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tanggal Mulai</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} className="cursor-pointer" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

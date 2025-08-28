@@ -105,7 +105,7 @@ export default async function Home() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="p-4 text-center">
+                    <td colSpan={9} className="p-4 text-center">
                       Tidak ada data
                     </td>
                   </tr>
