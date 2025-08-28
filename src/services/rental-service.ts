@@ -1,14 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma, Rental } from "@prisma/client";
-
-type CreateInput = {
-  carId: number;
-  customer: string;
-  startDate: Date;
-  duration: number;
-  extraHours: number;
-  payment: Prisma.RentalCreateInput;
-};
+import { Prisma } from "@prisma/client";
 
 export type RentalPayload = Prisma.RentalGetPayload<{
   include: {

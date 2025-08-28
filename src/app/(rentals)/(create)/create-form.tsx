@@ -101,7 +101,7 @@ function RentalCreateForm({ cars }: { cars: Car[] }) {
         toast.error(result.errors ?? "Rental gagal dibuat");
       }
     } catch (error) {
-      toast.error("Rental gagal dibuat");
+      toast.error("Rental gagal dibuat:\n" + error);
     }
   }
 

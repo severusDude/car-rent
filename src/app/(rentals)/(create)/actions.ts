@@ -6,6 +6,7 @@ import { rentalService } from "@/services/rental-service";
 import { revalidatePath } from "next/cache";
 
 // Define the server action return type
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type ActionResult<T = any> = {
   success: boolean;
   data?: T;
