@@ -6,6 +6,9 @@ import { carService } from "@/services/car-service";
 import { rentalService } from "@/services/rental-service";
 import RentalCreateForm from "@/app/(rentals)/(create)/create-form";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const rentals = await rentalService.index();
   const cars = await carService.index();
