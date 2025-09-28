@@ -1,5 +1,6 @@
-import { PromotionType } from "@prisma/client";
-import { prisma } from "../src/lib/prisma";
+import { PrismaClient, PromotionType } from "@prisma/client";
+
+const prisma: PrismaClient = new PrismaClient();
 
 async function seedCars() {
   const basePrice = 1000; // IDR
