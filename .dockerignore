@@ -1,0 +1,17 @@
+# Environment
+.env
+README.md
+
+# Docker
+.dockerignore
+compose.yaml
+Dockerfile
+Dockerfile.*
+
+# Library
+.next
+node_modules
+
+# Git
+.git
+.gitignore
